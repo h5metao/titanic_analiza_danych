@@ -9,8 +9,10 @@ def poczatek_print():
     print("[4.] Ilość osób, które przetrwały i zginęły")
     print("[5.] Histogram")
     print("[6.] Wykresy")
+    print("[7.] Wnioski")
     print("[0.] wyjście")
 
+#Funkcja do liczenia średniej podając kolumnę i nazwe pliku
 def oblicz_srednia(data, kolumna):
     df = pd.read_csv(data)
     srednia = df[kolumna].mean()
@@ -47,7 +49,6 @@ def segment_osoby(data):
 def segment_klasa_biletow(data):
     df = pd.read_csv(data)
     
-   
     first_class = df[df['Pclass'] == 1].shape[0]
     second_class = df[df['Pclass'] == 2].shape[0]
     third_class = df[df['Pclass'] == 3].shape[0]
@@ -60,24 +61,40 @@ def segment_klasa_biletow(data):
 
 def segment_zycie_smierc(data):
     df = pd.read_csv(data)
-    survived = df[df['Survived'] == 1].shape[0]
+    d1 = df['Survived']
+    
+    survived = df[d1 == 1].shape[0]
     died = df[df['Survived'] == 0].shape[0]
+    
+    woman_alive = df[df["Sex"] == "female"]["Survived"].value_counts()[1]
+    men_alive = df[df["Sex"] == "male"]["Survived"].value_counts()[1]
     
     print("--------------------------")
     print("Ilość przetrwałych osób: ", survived)
     print("Ilość osób, które zginęły: ", died)
+    print("Ilość kobiet, które przeżyły: ", woman_alive)
+    print("Ilość mężczyzn, którzy przeżyli: ", men_alive)
     print("--------------------------")
 
 def segment_wykresy(data):
     df = pd.read_csv(data)
 
     print("[1.] Wykres między [płeć, wiek, klasa biletu]")
+    print("[2.] Wykres między klasą biletów a ilością zgonów")
 
     user_choice = input("Podaj liczbę: ")
 
     if user_choice == "1":
         df.groupby('Sex')['Age', 'Pclass'].mean().plot.bar()
         plt.show()
+    if user_choice == "2":
+        grouped_data = df.groupby('Pclass')['Survived'].agg('count')
+        grouped_data.plot(kind='bar', color='blue', edgecolor='black')
+        plt.title('Number of Deaths by Ticket Class')
+        plt.xlabel('Ticket Class')
+        plt.ylabel('Number of Deaths')
+        plt.show() 
+
 
 def segment_histogram(data):
     df = pd.read_csv(data)
@@ -101,17 +118,16 @@ def segment_histogram(data):
         n, bins, patches = plt.hist(df["Fare"], bins=20, color='blue', alpha=0.7)
         plt.title('Histogram')
         plt.show()
-    
 
-
+def wnioski():
+    print("Płeć: Statystyki wskazują, że mężczyźni mieli niższą szansę na przeżycie niż kobiety.")
+    print("Klasa biletu: Pasażerowie pierwszej klasy mieli wyższą szansę na przeżycie niż pasażerowie niższych klas.")
+    print("Miejsce w kabinie: Miejsce w kabinie, w którym pasażerowie się znajdowali, może również wpłynąć na ich szansę na przeżycie.")
 
 nazwa_pliku = "train.csv"
-data = pd.read_csv(nazwa_pliku)
-control = 1
 while(True):
     poczatek_print()
     user_input = input("Wybierz liczbę: ")
-   
     
     if user_input == "0":
         break
@@ -128,3 +144,5 @@ while(True):
         segment_histogram(nazwa_pliku)
     elif user_input == "6":
         segment_wykresy(nazwa_pliku)
+    elif user_input == "7":
+          wnioski()
